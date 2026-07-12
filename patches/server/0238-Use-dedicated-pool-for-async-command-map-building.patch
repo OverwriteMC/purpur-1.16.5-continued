@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Github Actions <artyom030803@gmail.com>
+Date: Sun, 12 Jul 2026 21:02:27 +0300
+Subject: [PATCH] Use dedicated pool for async command map building
+
+
+diff --git a/src/main/java/net/minecraft/commands/CommandDispatcher.java b/src/main/java/net/minecraft/commands/CommandDispatcher.java
+index c5babb19a3b4d20c4f9e414d5654d18c570d2b2d..086bc54c26ba9474839ffb8fe5d473439ac5233f 100644
+--- a/src/main/java/net/minecraft/commands/CommandDispatcher.java
++++ b/src/main/java/net/minecraft/commands/CommandDispatcher.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.commands;
+ 
+ import com.google.common.collect.Maps;
++import com.google.common.util.concurrent.ThreadFactoryBuilder;
+ import com.mojang.brigadier.ParseResults;
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.arguments.ArgumentType;
+@@ -13,10 +14,14 @@ import com.mojang.brigadier.tree.RootCommandNode;
+ import java.util.Iterator;
+ import java.util.Map;
+ import java.util.Set;
++import java.util.concurrent.LinkedBlockingQueue;
++import java.util.concurrent.ThreadPoolExecutor;
++import java.util.concurrent.TimeUnit;
+ import java.util.function.Predicate;
+ import java.util.stream.Collectors;
+ import javax.annotation.Nullable;
+ import net.minecraft.EnumChatFormat;
++import net.minecraft.DefaultUncaughtExceptionHandler;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.SystemUtils;
+ import net.minecraft.commands.synchronization.ArgumentRegistry;
+@@ -113,6 +118,18 @@ import org.bukkit.event.server.ServerCommandEvent;
+ 
+ public class CommandDispatcher {
+ 
++    // Paper start - use dedicated pool for async command map building
++    private static final ThreadPoolExecutor COMMAND_SENDING_POOL = new ThreadPoolExecutor(
++        0, 2, 60L, TimeUnit.SECONDS,
++        new LinkedBlockingQueue<>(),
++        new ThreadFactoryBuilder()
++            .setNameFormat("Paper Async Command Builder Thread Pool - %1$d")
++            .setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(MinecraftServer.LOGGER))
++            .build(),
++        new ThreadPoolExecutor.DiscardPolicy()
++    );
++    // Paper end
++
+     private static final Logger LOGGER = LogManager.getLogger();
+     private final com.mojang.brigadier.CommandDispatcher<CommandListenerWrapper> b = new com.mojang.brigadier.CommandDispatcher();
+ 
+@@ -340,9 +357,9 @@ public class CommandDispatcher {
+         // CraftBukkit start
+         // Register Vanilla commands into builtRoot as before
+         // Paper start - Async command map building
+-        java.util.concurrent.ForkJoinPool.commonPool().execute(() -> {
+-            sendAsync(entityplayer);
+-        });
++        // Paper start - use dedicated pool for async command map building
++        COMMAND_SENDING_POOL.execute(() -> sendAsync(entityplayer));
++        // Paper end
+     }
+ 
+     private void sendAsync(EntityPlayer entityplayer) {
