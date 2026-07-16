@@ -35,7 +35,7 @@ index d1fe1242272a422b7b528876da0d76e1aa6f3eaa..8856ee8e0e7a3efda7921c0c8df9a2eb
 +        // Purpur start
 +        if (net.pl3x.purpur.PurpurConfig.useAlternateKeepAlive) {
 +            if (elapsedTime >= 1000L) { // 1 second
-+                if (!processedDisconnect && keepAlives.size() > KEEPALIVE_LIMIT) {
++                if (!processedDisconnect && keepAlives.size() > (KEEPALIVE_LIMIT / 1000L)) {
 +                    PlayerConnection.LOGGER.warn("{} was kicked due to keepalive timeout!", player.getName());
 +                    disconnect(new ChatMessage("disconnect.timeout"));
 +                } else {
