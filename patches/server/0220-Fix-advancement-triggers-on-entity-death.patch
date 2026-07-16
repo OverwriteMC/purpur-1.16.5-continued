@@ -55,7 +55,7 @@ index d96630a64f132eecf5cb4c80302cf9dd6176ad7c..b4afd71340a0c7e1b6aa2e3f01a6a4fc
 +        this.getHandEquipment().clear();
 +        List<ItemStack> handItems = list.get(0);
 +        for (int i = 0; i < handItems.size(); i++) {
-+            this.getHandEquipment().set(i, handItems.get(1));
++            this.getHandEquipment().set(i, handItems.get(i));
 +        }
 +        this.getArmorEquipment().clear();
 +        List<ItemStack> armorItems = list.get(1);
@@ -132,12 +132,12 @@ index ddc1c3383cdc32fa832485f3922c74185731557a..e28a2d983ae7b83f435c9dea606a92e2
 +        this.handItems.clear();
 +        List<ItemStack> handItems = list.get(0);
 +        for (int i = 0; i < handItems.size(); i++) {
-+            this.handItems.set(i, handItems.get(1));
++            this.handItems.set(i, handItems.get(i));
 +        }
 +        this.armorItems.clear();
 +        List<ItemStack> armorItems = list.get(1);
 +        for (int i = 0; i < armorItems.size(); i++) {
-+            this.armorItems.set(i, armorItems.get(1));
++            this.armorItems.set(i, armorItems.get(i));
 +        }
 +    }
 +
@@ -183,17 +183,17 @@ index 24285b1b2264939fdfa6f7d6311772fa67be8680..383b4cacc8c9f4fd5d2a83f683e5174e
 +        this.inventory.items.clear();
 +        List<ItemStack> invItems = list.get(0);
 +        for (int i = 0; i < invItems.size(); i++) {
-+            this.inventory.items.set(i, invItems.get(1));
++            this.inventory.items.set(i, invItems.get(i));
 +        }
 +        this.inventory.armor.clear();
 +        List<ItemStack> armorItems = list.get(1);
 +        for (int i = 0; i < armorItems.size(); i++) {
-+            this.inventory.armor.set(i, armorItems.get(1));
++            this.inventory.armor.set(i, armorItems.get(i));
 +        }
 +        this.inventory.extraSlots.clear();
 +        List<ItemStack> extraItems = list.get(2);
 +        for (int i = 0; i < extraItems.size(); i++) {
-+            this.inventory.extraSlots.set(i, extraItems.get(1));
++            this.inventory.extraSlots.set(i, extraItems.get(i));
 +        }
 +    }
 +
