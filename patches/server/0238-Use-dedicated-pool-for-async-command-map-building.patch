@@ -37,7 +37,7 @@ index c5babb19a3b4d20c4f9e414d5654d18c570d2b2d..086bc54c26ba9474839ffb8fe5d47343
  
 +    // Paper start - use dedicated pool for async command map building
 +    private static final ThreadPoolExecutor COMMAND_SENDING_POOL = new ThreadPoolExecutor(
-+        2, 2, 0L, TimeUnit.MILLISECONDS,
++        0, 2, 60L, TimeUnit.SECONDS,
 +        new LinkedBlockingQueue<>(),
 +        new ThreadFactoryBuilder()
 +            .setNameFormat("Paper Async Command Builder Thread Pool - %1$d")
