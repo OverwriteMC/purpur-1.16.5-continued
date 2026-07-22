@@ -151,7 +151,7 @@ index ddc1c3383cdc32fa832485f3922c74185731557a..e28a2d983ae7b83f435c9dea606a92e2
      public void setSlot(EnumItemSlot enumitemslot, ItemStack itemstack) {
          // CraftBukkit start
 diff --git a/src/main/java/net/minecraft/world/entity/player/EntityHuman.java b/src/main/java/net/minecraft/world/entity/player/EntityHuman.java
-index 24285b1b2264939fdfa6f7d6311772fa67be8680..383b4cacc8c9f4fd5d2a83f683e5174ea5025f61 100644
+index 24285b1b2264939fdfa6f7d6311772fa67be8680..d61048b2a8fe110610efa3ad86a6256426c2de66 100644
 --- a/src/main/java/net/minecraft/world/entity/player/EntityHuman.java
 +++ b/src/main/java/net/minecraft/world/entity/player/EntityHuman.java
 @@ -1886,6 +1886,52 @@ public abstract class EntityHuman extends EntityLiving {
@@ -183,7 +183,7 @@ index 24285b1b2264939fdfa6f7d6311772fa67be8680..383b4cacc8c9f4fd5d2a83f683e5174e
 +        this.inventory.items.clear();
 +        List<ItemStack> invItems = list.get(0);
 +        for (int i = 0; i < invItems.size(); i++) {
-+            this.inventory.items.set(i, invItems.get(1));
++            this.inventory.items.set(i, invItems.get(i));
 +        }
 +        this.inventory.armor.clear();
 +        List<ItemStack> armorItems = list.get(1);

@@ -5,7 +5,7 @@ Subject: [PATCH] Backport Paper void damage fix
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 2815a7fb9d8640ec7e0ff3b54e189a7657e4b6d9..f04da8e59e250fbcf21bbb273d0b4e5d8f6c1fa0 100644
+index 139c69f92addd4f886e09997e4a77f445528a588..68c162a5620a14fd29101e7d1c3e9bebe2eb8978 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -123,6 +123,7 @@ import org.bukkit.craftbukkit.event.CraftPortalEvent;
