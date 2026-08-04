@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Baroness <baroness@users.noreply.github.com>
+Date: Tue, 4 Aug 2026 07:00:00 +0300
+Subject: [PATCH] Fix mixed Netty versions
+
+Netty 4.2 modules were shaded together with Netty 4.1 classes bundled in
+the Minecraft server dependency. This produced an ABI-incompatible jar
+where ReadTimeoutHandler called EventExecutor#ticker(), but the packaged
+EventExecutor did not provide that method.
+
+Restore the Minecraft 1.16.5-compatible Netty 4.1 line and align it with
+Velocity Native's existing 4.1.52 dependency so every packaged class uses
+the same ABI.
+---
+ pom.xml                                                   | 23 +++++++++--------------
+ .../java/net/minecraft/network/NetworkManager.java        |  7 ++++---
+ 2 files changed, 13 insertions(+), 17 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 43f77c069863a1f8af0a2c4755edf7ccbc65f871..a07ca27ff4f668fa015939e01056cfae2cb18cab 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -34,6 +34,13 @@
+             <type>pom</type>
+             <scope>import</scope>
+         </dependency>
++        <dependency>
++            <groupId>io.netty</groupId>
++            <artifactId>netty-bom</artifactId>
++            <version>4.1.52.Final</version>
++            <type>pom</type>
++            <scope>import</scope>
++        </dependency>
+         </dependencies>
+     </dependencyManagement>
+ 
+@@ -55,20 +62,8 @@
+         <!-- Tuinity start - fix compile issue (cannot see new api) by moving netty include BEFORE server jar -->
+         <dependency>
+             <groupId>io.netty</groupId>
+-            <artifactId>netty-handler</artifactId>
+-            <version>4.2.16.Final</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.netty</groupId>
+-            <artifactId>netty-transport-native-epoll</artifactId>
+-            <version>4.2.16.Final</version>
+-            <classifier>linux-x86_64</classifier>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.netty</groupId>
+-            <artifactId>netty-transport-native-io_uring</artifactId>
+-            <version>4.2.16.Final</version>
+-            <classifier>linux-x86_64</classifier>
++            <artifactId>netty-all</artifactId>
++            <version>4.1.52.Final</version>
+         </dependency>
+         <!-- Tuinity end - fix compile issue (cannot see new api) by moving netty include BEFORE server jar -->
+         <!--
+diff --git a/src/main/java/net/minecraft/network/NetworkManager.java b/src/main/java/net/minecraft/network/NetworkManager.java
+index 2072855e485363256d26de4901912dd5a9be7e15..1dce5d3b1e994a060067de4901912dd5a9be7e15 100644
+--- a/src/main/java/net/minecraft/network/NetworkManager.java
++++ b/src/main/java/net/minecraft/network/NetworkManager.java
+@@ -45,6 +45,8 @@ import org.apache.logging.log4j.Logger;
+ import org.apache.logging.log4j.Marker;
+ import org.apache.logging.log4j.MarkerManager;
+ 
++import io.netty.util.concurrent.AbstractEventExecutor; // Tuinity
++
+ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+ 
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -429,7 +431,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+         } else {
+             // Tuinity start - optimise packets that are not flushed
+             Runnable choice1 = null;
+-            Runnable choice2 = null;
++            AbstractEventExecutor.LazyRunnable choice2 = null;
+             // note: since the type is not dynamic here, we need to actually copy the old executor code
+             // into two branches. On conflict, just re-copy - no changes were made inside the executor code.
+             if (flush) {
+@@ -468,8 +470,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+                 }}; // Origami - flatten lambda
+             } else {
+                 // explicitly declare a variable to make the lambda use the type
+-                // Paper - Netty 4.2 removed AbstractEventExecutor.LazyRunnable
+-                choice2 = new Runnable() { public void run() { // Origami - flatten lambda
++                choice2 = new AbstractEventExecutor.LazyRunnable() { public void run() { // Origami - flatten lambda
+                     if (enumprotocol != enumprotocol1) {
+                         NetworkManager.this.setProtocol(enumprotocol); // Origami - flatten lambda
+                     }
+-- 
+2.50.1
