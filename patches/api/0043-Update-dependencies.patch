@@ -3,6 +3,10 @@ From: Github Actions <artyom030803@gmail.com>
 Date: Thu, 9 Jul 2026 14:55:10 +0300
 Subject: [PATCH] Update dependencies
 
+Keep Guava at 21.0 because it is supplied by Minecraft 1.16.5 at
+runtime. Guava 33 changed Graphs.reachableNodes' return type from Set to
+ImmutableSet, which changes the JVM method descriptor and causes a
+NoSuchMethodError when loading plugins.
 
 diff --git a/pom.xml b/pom.xml
 index 6fd6066b16d4dbf8695be16ec8b2d135d4d04901..73e004f2ef47bd869175191caa2a8017729db86f 100644
@@ -21,8 +25,7 @@ index 6fd6066b16d4dbf8695be16ec8b2d135d4d04901..73e004f2ef47bd869175191caa2a8017
          <dependency>
              <groupId>com.google.guava</groupId>
              <artifactId>guava</artifactId>
--            <version>21.0</version>
-+            <version>33.5.0-jre</version>
+             <version>21.0</version>
              <scope>compile</scope>
          </dependency>
          <!-- bundled with Minecraft, should be kept in sync -->
@@ -106,10 +109,9 @@ index 6fd6066b16d4dbf8695be16ec8b2d135d4d04901..73e004f2ef47bd869175191caa2a8017
                  <version>3.2.0</version>
                  <configuration>
                      <links>
--                        <link>https://guava.dev/releases/21.0/api/docs/</link>
+                         <link>https://guava.dev/releases/21.0/api/docs/</link>
 -                        <link>https://javadoc.io/doc/org.yaml/snakeyaml/1.27/</link>
 -                        <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/20.1.0/</link>
-+                        <link>https://guava.dev/releases/33.5.0-jre/api/docs/</link>
 +                        <link>https://javadoc.io/doc/org.yaml/snakeyaml/1.33/</link>
 +                        <link>https://javadoc.io/doc/org.jetbrains/annotations/26.0.2/</link>
                          <link>https://javadoc.io/doc/net.md-5/bungeecord-chat/1.16-R0.4/</link>
